@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import type { CSSProperties } from "react";
 
 const NAV_LINKS = ["About", "Skills", "Projects", "Contact"];
 
