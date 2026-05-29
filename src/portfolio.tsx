@@ -1,5 +1,4 @@
-import { useState, useEffect, useRef } from "react";
-import type { CSSProperties } from "react";
+import { useState, useEffect, useRef, CSSProperties, ReactNode } from "react";
 
 const NAV_LINKS = ["About", "Skills", "Projects", "Contact"];
 
@@ -29,8 +28,8 @@ const SOCIALS = [
   { label: "LinkedIn", href: "https://www.linkedin.com/in/ashish-kumar-666a48385/" },
 ];
 
-function useInView(threshold = 0.15) {
-  const ref = useRef(null);
+function useInView(threshold = 0.15): [React.RefObject<HTMLDivElement>, boolean] {
+  const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   useEffect(() => {
     const obs = new IntersectionObserver(
@@ -43,7 +42,7 @@ function useInView(threshold = 0.15) {
   return [ref, visible];
 }
 
-function FadeIn({ children, delay = 0, style = {} }) {
+function FadeIn({ children, delay = 0, style = {} }: { children: ReactNode; delay?: number; style?: CSSProperties }) {
   const [ref, visible] = useInView();
   return (
     <div
@@ -62,14 +61,15 @@ function FadeIn({ children, delay = 0, style = {} }) {
 
 export default function Portfolio() {
   const [activeSection, setActiveSection] = useState("About");
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [, setMenuOpen] = useState(false);
   const [formState, setFormState] = useState({ name: "", email: "", message: "" });
   const [sent, setSent] = useState(false);
   const [cursorPos, setCursorPos] = useState({ x: -200, y: -200 });
   const [hovering, setHovering] = useState(false);
+  const [hoveredProject, setHoveredProject] = useState<number | null>(null);
 
   useEffect(() => {
-    const onMove = (e) => setCursorPos({ x: e.clientX, y: e.clientY });
+    const onMove = (e: MouseEvent) => setCursorPos({ x: e.clientX, y: e.clientY });
     window.addEventListener("mousemove", onMove);
     return () => window.removeEventListener("mousemove", onMove);
   }, []);
@@ -88,17 +88,17 @@ export default function Portfolio() {
     return () => obs.disconnect();
   }, []);
 
-  const scrollTo = (id) => {
+  const scrollTo = (id: string) => {
     document.getElementById(id.toLowerCase())?.scrollIntoView({ behavior: "smooth" });
     setMenuOpen(false);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSent(true);
   };
 
-  const styles = {
+  const styles: Record<string, CSSProperties> = {
     root: {
       background: "#0a0a0a",
       color: "#e8e6e0",
@@ -148,18 +148,6 @@ export default function Portfolio() {
       margin: 0,
       padding: 0,
     },
-    navLink: (active) => ({
-      fontSize: "0.72rem",
-      letterSpacing: "0.15em",
-      textTransform: "uppercase",
-      color: active ? "#c8f542" : "#888",
-      cursor: "pointer",
-      transition: "color 0.2s",
-      background: "none",
-      border: "none",
-      fontFamily: "inherit",
-      padding: 0,
-    }),
     hero: {
       minHeight: "100vh",
       display: "flex",
@@ -263,29 +251,6 @@ export default function Portfolio() {
     aboutHighlight: {
       color: "#e8e6e0",
     },
-    statsRow: {
-      display: "flex",
-      gap: "3rem",
-      marginTop: "3rem",
-      flexWrap: "wrap",
-    },
-    statItem: {
-      borderLeft: "1px solid #c8f542",
-      paddingLeft: "1rem",
-    },
-    statNumber: {
-      fontSize: "2rem",
-      fontWeight: 700,
-      color: "#e8e6e0",
-      letterSpacing: "-0.04em",
-    },
-    statLabel: {
-      fontSize: "0.72rem",
-      letterSpacing: "0.12em",
-      textTransform: "uppercase",
-      color: "#555",
-      marginTop: "0.2rem",
-    },
     skillsGrid: {
       display: "grid",
       gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
@@ -319,14 +284,6 @@ export default function Portfolio() {
       gap: "1px",
       background: "#1a1a1a",
     },
-    projectCard: (hov) => ({
-      background: hov ? "#0f0f0f" : "#0a0a0a",
-      padding: "2rem",
-      cursor: "default",
-      transition: "background 0.2s",
-      position: "relative",
-      overflow: "hidden",
-    }),
     projectYear: {
       fontSize: "0.68rem",
       letterSpacing: "0.15em",
@@ -414,7 +371,7 @@ export default function Portfolio() {
       padding: "0.75rem 1rem",
       outline: "none",
       transition: "border-color 0.2s",
-      boxSizing: "border-box",
+      boxSizing: "border-box" as const,
     },
     formTextarea: {
       width: "100%",
@@ -425,10 +382,10 @@ export default function Portfolio() {
       fontSize: "0.85rem",
       padding: "0.75rem 1rem",
       outline: "none",
-      resize: "vertical",
+      resize: "vertical" as const,
       minHeight: 120,
       transition: "border-color 0.2s",
-      boxSizing: "border-box",
+      boxSizing: "border-box" as const,
     },
     submitBtn: {
       display: "inline-flex",
@@ -452,7 +409,7 @@ export default function Portfolio() {
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
-      flexWrap: "wrap",
+      flexWrap: "wrap" as const,
       gap: "1rem",
     },
     footerText: {
@@ -462,7 +419,27 @@ export default function Portfolio() {
     },
   };
 
-  const [hoveredProject, setHoveredProject] = useState(null);
+  const projectCard = (hov: boolean): CSSProperties => ({
+    background: hov ? "#0f0f0f" : "#0a0a0a",
+    padding: "2rem",
+    cursor: "default",
+    transition: "background 0.2s",
+    position: "relative" as const,
+    overflow: "hidden",
+  });
+
+  const navLink = (active: boolean): CSSProperties => ({
+    fontSize: "0.72rem",
+    letterSpacing: "0.15em",
+    textTransform: "uppercase",
+    color: active ? "#c8f542" : "#888",
+    cursor: "pointer",
+    transition: "color 0.2s",
+    background: "none",
+    border: "none",
+    fontFamily: "inherit",
+    padding: 0,
+  });
 
   return (
     <>
@@ -481,7 +458,7 @@ export default function Portfolio() {
             {NAV_LINKS.map((n) => (
               <li key={n}>
                 <button
-                  style={styles.navLink(activeSection === n)}
+                  style={navLink(activeSection === n)}
                   onClick={() => scrollTo(n)}
                   onMouseEnter={() => setHovering(true)}
                   onMouseLeave={() => setHovering(false)}
@@ -497,7 +474,7 @@ export default function Portfolio() {
         <section id="hero" style={styles.hero}>
           <div style={styles.heroGrid} />
           <div style={styles.heroNumber}>01</div>
-          <div style={{ position: "relative", zIndex: 1 }}>
+          <div style={{ position: "relative" as const, zIndex: 1 }}>
             <FadeIn delay={0.1}>
               <p style={styles.heroSubtitle}>Available for work · 2025</p>
             </FadeIn>
@@ -536,7 +513,7 @@ export default function Portfolio() {
         <hr style={styles.divider} />
 
         {/* About */}
-        <section id="about" style={{ ...styles.section, position: "relative" }}>
+        <section id="about" style={{ ...styles.section, position: "relative" as const }}>
           <FadeIn>
             <p style={styles.sectionLabel}>01 / About</p>
             <h2 style={styles.sectionTitle}>Building things<br />that matter.</h2>
@@ -555,7 +532,6 @@ export default function Portfolio() {
               about software.
             </p>
           </FadeIn>
-
         </section>
 
         <hr style={styles.divider} />
@@ -597,7 +573,7 @@ export default function Portfolio() {
               {PROJECTS.map((p, i) => (
                 <div
                   key={p.title}
-                  style={styles.projectCard(hoveredProject === i)}
+                  style={projectCard(hoveredProject === i)}
                   onMouseEnter={() => { setHoveredProject(i); setHovering(true); }}
                   onMouseLeave={() => { setHoveredProject(null); setHovering(false); }}
                 >
