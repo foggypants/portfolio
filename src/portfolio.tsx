@@ -608,12 +608,12 @@ export default function Portfolio() {
                   would love to hear from you.
                 </p>
                 <a
-                  href="mailto:ashish@example.com"
+                  href="mailto:watsupd2@gmail.com"
                   style={styles.contactEmail}
                   onMouseEnter={() => setHovering(true)}
                   onMouseLeave={() => setHovering(false)}
                 >
-                  ashish@example.com
+                  watsupd2@gmail.com
                 </a>
                 <div style={styles.socialLinks}>
                   {SOCIALS.map((s) => (
